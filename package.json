@@ -1,0 +1,60 @@
+{
+  "name": "n8n-nodes-icd11",
+  "version": "0.1.0",
+  "description": "n8n community node for the WHO ICD-11 API (International Classification of Diseases)",
+  "keywords": [
+    "n8n-community-node-package",
+    "icd11",
+    "icd",
+    "who",
+    "health",
+    "healthcare",
+    "medical-coding"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Owito/n8n-nodes-icd11",
+  "author": {
+    "name": "Carlos Guerra"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Owito/n8n-nodes-icd11.git"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/Icd11Api.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Icd11/Icd11.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "gulp": "^5.0.0",
+    "n8n-workflow": "*",
+    "prettier": "^3.3.0",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.6.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
