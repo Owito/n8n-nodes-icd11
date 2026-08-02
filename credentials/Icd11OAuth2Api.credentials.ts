@@ -3,21 +3,23 @@ import type { ICredentialType, INodeProperties } from 'n8n-workflow';
 /**
  * Credencial para la ICD-11 API de la OMS.
  *
- * Datos verificados en la documentación oficial (icd.who.int/docs/icd-api):
+ * Datos verificados contra el repositorio oficial de ejemplos de la OMS
+ * (github.com/ICD-API/Python-samples):
  *   - Flujo OAuth2 "client credentials grant"
  *   - Token endpoint: https://icdaccessmanagement.who.int/connect/token
  *   - Scope: icdapi_access
- *   - Los tokens duran ~1 hora; n8n se encarga de renovarlos.
+ *   - Las credenciales viajan en el cuerpo de la peticion
+ *   - Los tokens duran ~1 hora; n8n se encarga de renovarlos
  *
- * El client ID y el client secret se obtienen gratis registrándose en
- * https://icd.who.int/icdapi (sección "API Access").
+ * El client ID y el client secret se obtienen gratis registrandose en
+ * https://icd.who.int/icdapi (seccion "API Access").
  */
-export class Icd11Api implements ICredentialType {
-	name = 'icd11Api';
+export class Icd11OAuth2Api implements ICredentialType {
+	name = 'icd11OAuth2Api';
 
-	displayName = 'ICD-11 API (WHO)';
+	displayName = 'ICD-11 OAuth2 API';
 
-	documentationUrl = 'https://icd.who.int/icdapi';
+	documentationUrl = 'https://icd.who.int/docs/icd-api/API-Authentication/';
 
 	extends = ['oAuth2Api'];
 
@@ -49,20 +51,10 @@ export class Icd11Api implements ICredentialType {
 		{
 			displayName: 'Base URL',
 			name: 'baseUrl',
-			type: 'options',
-			options: [
-				{
-					name: 'WHO Cloud (id.who.int)',
-					value: 'https://id.who.int',
-				},
-				{
-					name: 'Instancia local (Docker)',
-					value: 'http://localhost:80',
-				},
-			],
+			type: 'string',
 			default: 'https://id.who.int',
 			description:
-				'La API se puede consumir desde la nube de la OMS o desde un despliegue local en Docker',
+				'Direccion de la API. Usa la nube de la OMS o la de tu propio despliegue local en Docker.',
 		},
 	];
 }
