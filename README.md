@@ -8,6 +8,31 @@ Permite consultar y codificar diagnósticos desde un workflow de n8n, sin escrib
 
 En desarrollo. Todavía no publicado en npm.
 
+## Operaciones
+
+| Operación | Ruta | Estado |
+|---|---|---|
+| Buscar | `/icd/release/11/{release}/mms/search` | Verificada |
+| Autocodificar texto | `/icd/release/11/{release}/mms/autocode` | Verificada |
+| Consultar código | `/icd/release/11/{release}/mms/codeinfo/{code}` | Verificada |
+| Resolver URI de fundación | `/icd/release/11/{release}/mms/lookup` | Verificada |
+| Obtener entidad | `/icd/entity/{id}` | Verificada |
+| Listar versiones | `/icd/release/11` | Solo nube |
+
+Las cinco primeras se validaron contra la imagen oficial `whoicd/icd-api` (release `2026-01`), comprobando ida y vuelta: `autocode` de "cholera" devuelve el código **1A00** con puntuación 1, `codeinfo/1A00` resuelve al mismo `stemId`, y su `foundationURI` resuelto por `lookup` y por `/icd/entity/{id}` devuelve de nuevo Cholera.
+
+`Listar versiones` **no está disponible en despliegues locales**: el contenedor embebe una sola versión y responde 404. La operación se mantiene para la nube de la OMS.
+
+## Probar sin credenciales
+
+La imagen oficial no exige OAuth, así que sirve para desarrollo:
+
+```bash
+docker run -d -p 8080:80 -e acceptLicense=true -e saveAnalytics=false whoicd/icd-api
+```
+
+Ojo: el contenedor trae **solo inglés**, así que `Accept-Language: es` solo devuelve español contra la nube. Y expone su propio Swagger en `/swagger/index.html`, útil porque el de la nube exige autenticación.
+
 ## Requisitos
 
 - n8n 1.x o superior

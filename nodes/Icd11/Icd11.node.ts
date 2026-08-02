@@ -90,7 +90,8 @@ export class Icd11 implements INodeType {
 					{
 						name: 'Listar Versiones',
 						value: 'listReleases',
-						description: 'Listar las versiones publicadas de la CIE-11',
+						description:
+							'Listar las versiones publicadas de la CIE-11. Solo disponible en la nube de la OMS: los despliegues locales en Docker traen una unica version embebida y devuelven 404.',
 						action: 'Listar las versiones publicadas',
 						routing: {
 							request: {
@@ -130,10 +131,10 @@ export class Icd11 implements INodeType {
 				displayName: 'Version (Release)',
 				name: 'release',
 				type: 'string',
-				default: '2025-01',
+				default: '2026-01',
 				required: true,
 				description:
-					'Version publicada de la CIE-11, por ejemplo 2025-01 o 2024-01. Usa la operacion Listar Versiones para ver las disponibles.',
+					'Version publicada de la CIE-11, por ejemplo 2026-01 o 2025-01. Usa la operacion Listar Versiones para ver las disponibles en la nube.',
 				displayOptions: {
 					show: {
 						operation: ['search', 'autocode', 'codeInfo', 'lookup'],
