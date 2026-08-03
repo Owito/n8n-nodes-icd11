@@ -1,71 +1,82 @@
 # n8n-nodes-icd11
 
-Nodo community de [n8n](https://n8n.io/) para la **ICD-11 API de la Organización Mundial de la Salud**, la Clasificación Internacional de Enfermedades.
+An [n8n](https://n8n.io/) community node for the **WHO ICD-11 API**, the World Health Organization's International Classification of Diseases.
 
-Permite consultar y codificar diagnósticos desde un workflow de n8n, sin escribir llamadas HTTP a mano ni gestionar el ciclo de vida del token.
+It lets you search and code diagnoses from an n8n workflow, without hand-writing HTTP calls or managing the token lifecycle yourself.
 
-## Estado
+## Status
 
-En desarrollo. Todavía no publicado en npm.
+In development. Not published to npm yet.
 
-## Operaciones
+## Operations
 
-| Operación | Ruta | Estado |
+| Operation | Route | Status |
 |---|---|---|
-| Buscar | `/icd/release/11/{release}/mms/search` | Verificada |
-| Autocodificar texto | `/icd/release/11/{release}/mms/autocode` | Verificada |
-| Consultar código | `/icd/release/11/{release}/mms/codeinfo/{code}` | Verificada |
-| Resolver URI de fundación | `/icd/release/11/{release}/mms/lookup` | Verificada |
-| Obtener entidad | `/icd/entity/{id}` | Verificada |
-| Listar versiones | `/icd/release/11` | Solo nube |
+| Search | `/icd/release/11/{release}/mms/search` | Verified |
+| Autocode Text | `/icd/release/11/{release}/mms/autocode` | Verified |
+| Get Code Info | `/icd/release/11/{release}/mms/codeinfo/{code}` | Verified |
+| Look Up Foundation URI | `/icd/release/11/{release}/mms/lookup` | Verified |
+| Get Entity | `/icd/entity/{id}` | Verified |
+| List Releases | `/icd/release/11` | Cloud only |
 
-Las cinco primeras se validaron contra la imagen oficial `whoicd/icd-api` (release `2026-01`), comprobando ida y vuelta: `autocode` de "cholera" devuelve el código **1A00** con puntuación 1, `codeinfo/1A00` resuelve al mismo `stemId`, y su `foundationURI` resuelto por `lookup` y por `/icd/entity/{id}` devuelve de nuevo Cholera.
+The first five were validated against the official `whoicd/icd-api` image (release `2026-01`) with a round-trip check: `autocode` on "cholera" returns code **1A00** with score 1, `codeinfo/1A00` resolves to the same `stemId`, and its `foundationURI` resolved through both `lookup` and `/icd/entity/{id}` returns Cholera again.
 
-`Listar versiones` **no está disponible en despliegues locales**: el contenedor embebe una sola versión y responde 404. La operación se mantiene para la nube de la OMS.
+`List Releases` is **not available on local deployments**: the container embeds a single release and answers 404. The operation is kept for the WHO cloud API.
 
-## Probar sin credenciales
+## Example workflow
 
-La imagen oficial no exige OAuth, así que sirve para desarrollo:
+Turn a free-text diagnosis into a billable ICD-11 code:
+
+1. **Autocode Text** with Clinical Text set to `acute myocardial infarction`. The response carries `theCode` and a `matchScore`.
+2. **Get Code Info** with Code set to the `theCode` from the previous step, to pull the full title, parent and `stemId`.
+
+Set **Match Threshold** under Options to discard weak matches, and **Language** to get the content in a language other than English.
+
+## Testing without credentials
+
+The official image does not require OAuth, so it works for development:
 
 ```bash
 docker run -d -p 8080:80 -e acceptLicense=true -e saveAnalytics=false whoicd/icd-api
 ```
 
-Ojo: el contenedor trae **solo inglés**, así que `Accept-Language: es` solo devuelve español contra la nube. Y expone su propio Swagger en `/swagger/index.html`, útil porque el de la nube exige autenticación.
+Point the credential's **Base URL** at `http://localhost:8080`.
 
-## Requisitos
+Two caveats: the container ships **English only**, so `Accept-Language` other than `en` only pays off against the cloud API; and it exposes its own Swagger at `/swagger/index.html`, which is handy because the cloud one requires authentication.
 
-- n8n 1.x o superior
-- Credenciales de la ICD API (gratuitas)
+## Requirements
 
-## Obtener credenciales
+- n8n 1.x or later
+- ICD API credentials (free)
 
-1. Registrate en <https://icd.who.int/icdapi>
-2. Confirmá tu correo con el enlace que envía la OMS
-3. Iniciá sesión y entrá a **API Access → View API access key(s)**
-4. Copiá el `client_id` y el `client_secret`
+## Getting credentials
 
-## Autenticación
+1. Register at <https://icd.who.int/icdapi>
+2. Confirm your email with the link the WHO sends you
+3. Sign in and go to **API Access → View API access key(s)**
+4. Copy the `client_id` and the `client_secret`
 
-El nodo usa **OAuth2 con client credentials grant**:
+## Authentication
+
+The node uses **OAuth2 with the client credentials grant**:
 
 | | |
 |---|---|
 | Token endpoint | `https://icdaccessmanagement.who.int/connect/token` |
 | Scope | `icdapi_access` |
-| Duración del token | ~1 hora (n8n lo renueva solo) |
+| Token lifetime | ~1 hour (n8n refreshes it for you) |
 | Base URL | `https://id.who.int` |
 
-La API también se puede desplegar localmente con Docker, útil para pruebas sin depender de la red. La credencial permite elegir entre la nube de la OMS y una instancia local.
+The API can also be deployed locally with Docker, which is useful for testing without depending on the network. The credential lets you pick between the WHO cloud and a local instance.
 
-## Cabeceras requeridas
+## Required headers
 
-La API exige `API-Version: v2` y acepta `Accept-Language` para negociar el idioma del contenido, incluido español.
+The API requires `API-Version: v2` and accepts `Accept-Language` to negotiate the language of the returned content.
 
-## Licencia
+## License
 
 MIT
 
-## Descargo
+## Disclaimer
 
-Este es un proyecto community independiente. No está afiliado ni respaldado por la Organización Mundial de la Salud. El uso del contenido de la CIE está sujeto a los términos de licencia de la OMS.
+This is an independent community project. It is not affiliated with or endorsed by the World Health Organization. Use of ICD content is subject to the WHO's licensing terms.

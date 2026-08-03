@@ -1,20 +1,21 @@
+import { NodeConnectionTypes } from 'n8n-workflow';
 import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
 
 /**
- * Nodo para la ICD-11 API de la OMS.
+ * Node for the WHO ICD-11 API.
  *
- * Rutas verificadas contra el repositorio oficial de ejemplos de la OMS
- * (github.com/ICD-API/Python-samples) y confirmadas de forma independiente
- * en varias implementaciones publicas:
+ * Routes verified against the WHO's official sample repository
+ * (github.com/ICD-API/Python-samples) and independently confirmed
+ * across several public implementations:
  *
- *   GET /icd/release/11                                  -> releases disponibles
- *   GET /icd/release/11/{release}/mms/search             -> busqueda
- *   GET /icd/release/11/{release}/mms/autocode           -> texto libre a codigo
- *   GET /icd/release/11/{release}/mms/codeinfo/{code}    -> detalle por codigo
- *   GET /icd/release/11/{release}/mms/lookup             -> resolver un foundationUri
- *   GET /icd/entity/{id}                                 -> entidad de la fundacion
+ *   GET /icd/release/11                                  -> available releases
+ *   GET /icd/release/11/{release}/mms/search             -> search
+ *   GET /icd/release/11/{release}/mms/autocode           -> free text to code
+ *   GET /icd/release/11/{release}/mms/codeinfo/{code}    -> detail for a code
+ *   GET /icd/release/11/{release}/mms/lookup             -> resolve a foundationUri
+ *   GET /icd/entity/{id}                                 -> foundation entity
  *
- * La API exige la cabecera 'API-Version: v2' y acepta 'Accept-Language'.
+ * The API requires the 'API-Version: v2' header and accepts 'Accept-Language'.
  */
 export class Icd11 implements INodeType {
 	description: INodeTypeDescription = {
@@ -24,12 +25,13 @@ export class Icd11 implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
-		description: 'Consulta la Clasificacion Internacional de Enfermedades (CIE-11) de la OMS',
+		description: 'Query the WHO International Classification of Diseases (ICD-11)',
 		defaults: {
 			name: 'ICD-11',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'icd11OAuth2Api',
@@ -52,10 +54,10 @@ export class Icd11 implements INodeType {
 				default: 'search',
 				options: [
 					{
-						name: 'Autocodificar Texto',
+						name: 'Autocode Text',
 						value: 'autocode',
-						description: 'Obtener el mejor codigo CIE-11 para un texto clinico libre',
-						action: 'Autocodificar un texto clinico',
+						description: 'Get the best matching ICD-11 code for free clinical text',
+						action: 'Autocode clinical text',
 						routing: {
 							request: {
 								method: 'GET',
@@ -64,22 +66,10 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						name: 'Buscar',
-						value: 'search',
-						description: 'Buscar entidades en la linealizacion MMS',
-						action: 'Buscar en la CIE 11',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/icd/release/11/{{$parameter.release}}/mms/search',
-							},
-						},
-					},
-					{
-						name: 'Consultar Codigo',
+						name: 'Get Code Info',
 						value: 'codeInfo',
-						description: 'Obtener el detalle de un codigo CIE-11 concreto',
-						action: 'Consultar un codigo CIE 11',
+						description: 'Get the details of a specific ICD-11 code',
+						action: 'Get code info',
 						routing: {
 							request: {
 								method: 'GET',
@@ -88,23 +78,10 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						name: 'Listar Versiones',
-						value: 'listReleases',
-						description:
-							'Listar las versiones publicadas de la CIE-11. Solo disponible en la nube de la OMS: los despliegues locales en Docker traen una unica version embebida y devuelven 404.',
-						action: 'Listar las versiones publicadas',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '/icd/release/11',
-							},
-						},
-					},
-					{
-						name: 'Obtener Entidad',
+						name: 'Get Entity',
 						value: 'getEntity',
-						description: 'Obtener una entidad de la fundacion por su identificador',
-						action: 'Obtener una entidad de la fundacion',
+						description: 'Get a foundation entity by its identifier',
+						action: 'Get a foundation entity',
 						routing: {
 							request: {
 								method: 'GET',
@@ -113,10 +90,23 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						name: 'Resolver URI De Fundacion',
+						name: 'List Releases',
+						value: 'listReleases',
+						description:
+							'List the published ICD-11 releases. Only available on the WHO cloud API: local Docker deployments embed a single release and return 404.',
+						action: 'List published releases',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/icd/release/11',
+							},
+						},
+					},
+					{
+						name: 'Look Up Foundation URI',
 						value: 'lookup',
-						description: 'Resolver un foundationUri dentro de la linealizacion MMS',
-						action: 'Resolver un URI de fundacion',
+						description: 'Resolve a foundation URI within the MMS linearization',
+						action: 'Look up a foundation URI',
 						routing: {
 							request: {
 								method: 'GET',
@@ -124,17 +114,29 @@ export class Icd11 implements INodeType {
 							},
 						},
 					},
+					{
+						name: 'Search',
+						value: 'search',
+						description: 'Search for entities in the MMS linearization',
+						action: 'Search the ICD 11',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/icd/release/11/{{$parameter.release}}/mms/search',
+							},
+						},
+					},
 				],
 			},
 
 			{
-				displayName: 'Version (Release)',
+				displayName: 'Release',
 				name: 'release',
 				type: 'string',
 				default: '2026-01',
 				required: true,
 				description:
-					'Version publicada de la CIE-11, por ejemplo 2026-01 o 2025-01. Usa la operacion Listar Versiones para ver las disponibles en la nube.',
+					'Published ICD-11 release, for example 2026-01 or 2025-01. Use the List Releases operation to see the ones available on the cloud API.',
 				displayOptions: {
 					show: {
 						operation: ['search', 'autocode', 'codeInfo', 'lookup'],
@@ -143,12 +145,12 @@ export class Icd11 implements INodeType {
 			},
 
 			{
-				displayName: 'Consulta',
+				displayName: 'Query',
 				name: 'q',
 				type: 'string',
 				default: '',
 				required: true,
-				description: 'Texto a buscar',
+				description: 'Text to search for',
 				displayOptions: {
 					show: {
 						operation: ['search'],
@@ -164,12 +166,12 @@ export class Icd11 implements INodeType {
 			},
 
 			{
-				displayName: 'Texto Clinico',
+				displayName: 'Clinical Text',
 				name: 'searchText',
 				type: 'string',
 				default: '',
 				required: true,
-				description: 'Texto libre a convertir en un codigo CIE-11',
+				description: 'Free text to convert into an ICD-11 code',
 				displayOptions: {
 					show: {
 						operation: ['autocode'],
@@ -185,12 +187,12 @@ export class Icd11 implements INodeType {
 			},
 
 			{
-				displayName: 'Codigo',
+				displayName: 'Code',
 				name: 'code',
 				type: 'string',
 				default: '',
 				required: true,
-				description: 'Codigo CIE-11 a consultar, por ejemplo 1A00',
+				description: 'ICD-11 code to look up, for example 1A00',
 				displayOptions: {
 					show: {
 						operation: ['codeInfo'],
@@ -199,12 +201,12 @@ export class Icd11 implements INodeType {
 			},
 
 			{
-				displayName: 'ID De Entidad',
+				displayName: 'Entity ID',
 				name: 'entityId',
 				type: 'string',
 				default: '',
 				required: true,
-				description: 'Identificador numerico de la entidad, por ejemplo 257068234',
+				description: 'Numeric identifier of the entity, for example 257068234',
 				displayOptions: {
 					show: {
 						operation: ['getEntity'],
@@ -219,7 +221,7 @@ export class Icd11 implements INodeType {
 				default: '',
 				required: true,
 				description:
-					'URI de fundacion devuelto por una busqueda previa, que apunta a una entidad de la fundacion',
+					'Foundation URI returned by a previous search, pointing to an entity in the foundation',
 				displayOptions: {
 					show: {
 						operation: ['lookup'],
@@ -235,19 +237,19 @@ export class Icd11 implements INodeType {
 			},
 
 			{
-				displayName: 'Opciones',
+				displayName: 'Options',
 				name: 'options',
 				type: 'collection',
-				placeholder: 'Anadir opcion',
+				placeholder: 'Add option',
 				default: {},
 				options: [
 					{
-						displayName: 'Filtro De Capitulos',
+						displayName: 'Chapter Filter',
 						name: 'chapterFilter',
 						type: 'string',
 						default: '',
 						description:
-							'Lista de capitulos separados por punto y coma para acotar la busqueda, por ejemplo 01;02;03',
+							'Semicolon separated list of chapters to narrow the search down to, for example 01;02;03',
 						routing: {
 							request: {
 								qs: {
@@ -257,36 +259,7 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						displayName: 'Idioma',
-						name: 'acceptLanguage',
-						type: 'string',
-						default: 'es',
-						description:
-							'Idioma del contenido devuelto, segun la cabecera Accept-Language. La CIE-11 incluye espanol.',
-						routing: {
-							request: {
-								headers: {
-									'Accept-Language': '={{$value}}',
-								},
-							},
-						},
-					},
-					{
-						displayName: 'Incluir Resultado De Palabras Clave',
-						name: 'includeKeywordResult',
-						type: 'boolean',
-						default: false,
-						description: 'Whether to include the keyword based result set',
-						routing: {
-							request: {
-								qs: {
-									includeKeywordResult: '={{$value}}',
-								},
-							},
-						},
-					},
-					{
-						displayName: 'Resultados Planos',
+						displayName: 'Flat Results',
 						name: 'flatResults',
 						type: 'boolean',
 						default: true,
@@ -301,7 +274,36 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						displayName: 'Umbral De Coincidencia',
+						displayName: 'Include Keyword Result',
+						name: 'includeKeywordResult',
+						type: 'boolean',
+						default: false,
+						description: 'Whether to include the keyword based result set',
+						routing: {
+							request: {
+								qs: {
+									includeKeywordResult: '={{$value}}',
+								},
+							},
+						},
+					},
+					{
+						displayName: 'Language',
+						name: 'acceptLanguage',
+						type: 'string',
+						default: 'en',
+						description:
+							'Language of the returned content, sent as the Accept-Language header. The ICD-11 is available in several languages on the cloud API.',
+						routing: {
+							request: {
+								headers: {
+									'Accept-Language': '={{$value}}',
+								},
+							},
+						},
+					},
+					{
+						displayName: 'Match Threshold',
 						name: 'matchThreshold',
 						type: 'number',
 						typeOptions: {
@@ -311,7 +313,7 @@ export class Icd11 implements INodeType {
 						},
 						default: 0.5,
 						description:
-							'Puntuacion minima para aceptar una coincidencia al autocodificar, entre 0 y 1',
+							'Minimum score, between 0 and 1, required to accept a match when autocoding',
 						routing: {
 							request: {
 								qs: {
@@ -321,7 +323,7 @@ export class Icd11 implements INodeType {
 						},
 					},
 					{
-						displayName: 'Usar Flexisearch',
+						displayName: 'Use Flexisearch',
 						name: 'useFlexisearch',
 						type: 'boolean',
 						default: false,

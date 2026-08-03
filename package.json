@@ -14,7 +14,8 @@
   "license": "MIT",
   "homepage": "https://github.com/Owito/n8n-nodes-icd11",
   "author": {
-    "name": "Carlos Guerra"
+    "name": "Carlos Guerra",
+    "email": "fgoguerra@gmail.com"
   },
   "repository": {
     "type": "git",
@@ -28,8 +29,8 @@
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials",
-    "lintfix": "eslint nodes credentials --fix",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
     "prepublishOnly": "npm run build && npm run lint"
   },
   "files": [
@@ -45,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@n8n/eslint-plugin-community-nodes": "^0.27.0",
     "@types/node": "^22.20.1",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
