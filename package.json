@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-icd11",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "n8n community node for the WHO ICD-11 API (International Classification of Diseases)",
   "keywords": [
     "n8n-community-node-package",

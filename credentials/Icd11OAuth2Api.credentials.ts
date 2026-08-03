@@ -1,4 +1,4 @@
-import type { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 /**
  * Credential for the WHO ICD-11 API.
@@ -59,4 +59,27 @@ export class Icd11OAuth2Api implements ICredentialType {
 				'Address of the API. Use the WHO cloud API or your own local Docker deployment.',
 		},
 	];
+
+	/**
+	 * Credential test: fetch a single, stable foundation entity. It returns 200
+	 * only once the client credentials have produced a valid token, which is
+	 * exactly what needs checking.
+	 *
+	 * 257068234 is Cholera, a core ICD entity with a persistent identifier. It
+	 * was picked over the more obvious /icd/release/11 because this route is
+	 * verified to answer on both the WHO cloud API and a local Docker
+	 * deployment, whereas /icd/release/11 answers 404 on local deployments
+	 * (they embed a single release) and would report a failing credential to
+	 * anyone developing against the container.
+	 */
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.baseUrl}}',
+			url: '/icd/entity/257068234',
+			headers: {
+				Accept: 'application/json',
+				'API-Version': 'v2',
+			},
+		},
+	};
 }
