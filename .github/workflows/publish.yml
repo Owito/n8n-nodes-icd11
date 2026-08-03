@@ -3,6 +3,15 @@ name: Publish to npm
 # Requisito de n8n desde el 1 de mayo de 2026: los nodos enviados a verificación
 # deben publicarse desde GitHub Actions con declaración de procedencia (provenance).
 # n8n ya no acepta paquetes verificados publicados desde una máquina local.
+#
+# Autenticación por trusted publishing (OIDC), sin token de larga vida: npm
+# confía en este repositorio y en este workflow, y emite una credencial efímera
+# en cada ejecución. Requiere que el paquete tenga configurado el Trusted
+# Publisher en npmjs.com (organización Owito, repositorio n8n-nodes-icd11,
+# workflow publish.yml).
+#
+# Con OIDC npm genera y publica la provenance por su cuenta, así que ya no se
+# pasa --provenance ni se define NODE_AUTH_TOKEN.
 
 on:
   push:
@@ -12,21 +21,24 @@ on:
 
 permissions:
   contents: read
-  id-token: write # necesario para la provenance de npm
+  id-token: write # necesario para el OIDC de trusted publishing
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          # Node 24 trae npm 11.x; trusted publishing exige npm >= 11.5.1
+          # y Node >= 22.14.0.
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-          cache: npm
+          # npm desaconseja cachear en builds de publicación.
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci
@@ -37,7 +49,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish with provenance
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: npm publish --access public
