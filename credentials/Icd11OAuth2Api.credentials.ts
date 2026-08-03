@@ -71,6 +71,10 @@ export class Icd11OAuth2Api implements ICredentialType {
 	 * deployment, whereas /icd/release/11 answers 404 on local deployments
 	 * (they embed a single release) and would report a failing credential to
 	 * anyone developing against the container.
+	 *
+	 * Accept-Language is required: without it the API answers 404 rather than
+	 * falling back to a default language, which would report a working
+	 * credential as broken.
 	 */
 	test: ICredentialTestRequest = {
 		request: {
@@ -79,6 +83,7 @@ export class Icd11OAuth2Api implements ICredentialType {
 			headers: {
 				Accept: 'application/json',
 				'API-Version': 'v2',
+				'Accept-Language': 'en',
 			},
 		},
 	};

@@ -43,6 +43,12 @@ export class Icd11 implements INodeType {
 			headers: {
 				Accept: 'application/json',
 				'API-Version': 'v2',
+				// The API does not fall back to a default language: without an
+				// explicit Accept-Language it answers 404 (or 500 on autocode) on
+				// almost every route. Verified against the official whoicd/icd-api
+				// image: only codeinfo replies without it. English is sent by
+				// default and the Language option below overrides it.
+				'Accept-Language': 'en',
 			},
 		},
 		properties: [
