@@ -6,7 +6,21 @@ It lets you search and code diagnoses from an n8n workflow, without hand-writing
 
 ## Status
 
-In development. Not published to npm yet.
+Published on npm as [`n8n-nodes-icd11`](https://www.npmjs.com/package/n8n-nodes-icd11). Every release is published from GitHub Actions with npm provenance, as n8n requires for verified nodes.
+
+## Installation
+
+In n8n, go to **Settings → Community nodes → Install** and enter:
+
+```
+n8n-nodes-icd11
+```
+
+For a self-hosted instance you can also install it directly:
+
+```bash
+npm install n8n-nodes-icd11
+```
 
 ## Operations
 
@@ -47,6 +61,7 @@ Two caveats: the container ships **English only**, so `Accept-Language` other th
 ## Requirements
 
 - n8n 1.x or later
+- Node.js 20.19 or later
 - ICD API credentials (free)
 
 ## Getting credentials
