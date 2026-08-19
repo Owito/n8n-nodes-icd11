@@ -1,0 +1,71 @@
+{
+  "name": "ICD-11 demo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-40, 0]
+    },
+    {
+      "parameters": {
+        "operation": "autocode",
+        "release": "2026-01",
+        "searchText": "acute myocardial infarction",
+        "options": {
+          "matchThreshold": 0.5
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Autocode Text",
+      "type": "n8n-nodes-icd11.icd11",
+      "typeVersion": 1,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "operation": "codeInfo",
+        "release": "2026-01",
+        "code": "={{ $json.theCode }}",
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Get Code Info",
+      "type": "n8n-nodes-icd11.icd11",
+      "typeVersion": 1,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "release": "2026-01",
+        "q": "cholera",
+        "options": {
+          "flatResults": true
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Search",
+      "type": "n8n-nodes-icd11.icd11",
+      "typeVersion": 1,
+      "position": [200, 200]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          { "node": "Autocode Text", "type": "main", "index": 0 },
+          { "node": "Search", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Autocode Text": {
+      "main": [[{ "node": "Get Code Info", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {},
+  "pinData": {}
+}

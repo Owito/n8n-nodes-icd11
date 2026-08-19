@@ -1,0 +1,22 @@
+# Automated check only, not for interactive use.
+#
+# Installs the published package at startup through
+# N8N_COMMUNITY_PACKAGES_MANAGED_BY_ENV, which proves n8n loads the node
+# without going through the UI (the UI requires creating the owner user
+# first). docker-compose.yml deliberately does NOT do this: there you install
+# the node by hand from Settings, the way a user would.
+
+services:
+  n8n-test:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n-test-icd11
+    ports:
+      - '5679:5678'
+    environment:
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=true
+      - N8N_COMMUNITY_PACKAGES_MANAGED_BY_ENV=true
+      - N8N_COMMUNITY_PACKAGES=[{"name":"n8n-nodes-icd11","version":"0.1.3"}]
+      - N8N_SECURE_COOKIE=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - GENERIC_TIMEZONE=UTC

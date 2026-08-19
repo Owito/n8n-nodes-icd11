@@ -31,6 +31,7 @@
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
+    "test": "node test/validate-workflow.js",
     "prepublishOnly": "npm run build && npm run lint"
   },
   "files": [
