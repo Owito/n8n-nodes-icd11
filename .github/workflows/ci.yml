@@ -21,8 +21,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The range declared in package.json engines.
-        node-version: ['20.19', '22', '24']
+        # Development toolchain only. `n8n-workflow` pulls in `isolated-vm`, a
+        # native module that does not build against the V8 shipped with Node
+        # 20, so the dev install needs Node >= 22.
+        #
+        # The published package is unaffected: it has zero runtime dependencies
+        # and is plain JavaScript loaded by n8n, so `engines: >=20.19` in
+        # package.json remains the correct requirement for consumers.
+        node-version: ['22', '24']
     steps:
       - name: Checkout
         uses: actions/checkout@v6
