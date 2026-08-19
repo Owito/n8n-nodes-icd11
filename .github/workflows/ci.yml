@@ -1,0 +1,46 @@
+name: CI
+
+# Lint, build and structural validation on every push and pull request.
+#
+# The validation step loads the compiled node description and checks the demo
+# workflow against it, so it needs no WHO API credentials and no network. See
+# test/README.md.
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The range declared in package.json engines.
+        node-version: ['20.19', '22', '24']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate demo workflow against the compiled node
+        run: npm test

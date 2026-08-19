@@ -1,0 +1,33 @@
+# Self-hosted n8n to try the node by hand.
+#
+# Self-hosting is required because n8n Cloud does not allow installing
+# unverified community nodes, and installing from npm is self-hosted only.
+#
+#   docker compose -f test/docker-compose.yml up -d
+#   open http://localhost:5678, then Settings > Community nodes > Install
+#   and enter: n8n-nodes-icd11
+#
+# The three community-package variables already default to true; they are
+# spelled out so it is visible that nothing is rigged.
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n-demo-icd11
+    restart: unless-stopped
+    ports:
+      - '5678:5678'
+    environment:
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=true
+      - N8N_VERIFIED_PACKAGES_ENABLED=true
+      - GENERIC_TIMEZONE=UTC
+      - TZ=UTC
+      # Without this n8n rejects the session cookie when served over http.
+      - N8N_SECURE_COOKIE=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
