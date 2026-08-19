@@ -12,6 +12,10 @@ name: Publish to npm
 #
 # Under OIDC npm generates and publishes the provenance itself, so neither
 # --provenance nor NODE_AUTH_TOKEN is passed here.
+#
+# Actions are pinned to a full commit SHA rather than a tag. Tags are mutable:
+# whoever can move one would run arbitrary code in a job that holds
+# `id-token: write`, which is the credential that publishes this package.
 
 on:
   push:
@@ -28,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           # Node 24 ships npm 11.x; trusted publishing requires npm >= 11.5.1
           # and Node >= 22.14.0.
