@@ -1,12 +1,28 @@
 # n8n-nodes-icd11
 
+[![npm version](https://img.shields.io/npm/v/n8n-nodes-icd11?logo=npm&color=cb3837)](https://www.npmjs.com/package/n8n-nodes-icd11)
+[![npm downloads](https://img.shields.io/npm/dm/n8n-nodes-icd11?logo=npm&color=cb3837)](https://www.npmjs.com/package/n8n-nodes-icd11)
+[![CI](https://github.com/Owito/n8n-nodes-icd11/actions/workflows/ci.yml/badge.svg)](https://github.com/Owito/n8n-nodes-icd11/actions/workflows/ci.yml)
+[![npm provenance](https://img.shields.io/badge/npm-provenance%20signed-2ea44f?logo=npm)](https://www.npmjs.com/package/n8n-nodes-icd11#provenance)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![runtime dependencies](https://img.shields.io/badge/runtime%20dependencies-0-2ea44f)](package.json)
+
 An [n8n](https://n8n.io/) community node for the **WHO ICD-11 API**, the World Health Organization's International Classification of Diseases.
 
 It lets you search and code diagnoses from an n8n workflow, without hand-writing HTTP calls or managing the token lifecycle yourself.
 
 ## Status
 
-Published on npm as [`n8n-nodes-icd11`](https://www.npmjs.com/package/n8n-nodes-icd11). Every release is published from GitHub Actions with npm provenance, as n8n requires for verified nodes.
+Published on npm as [`n8n-nodes-icd11`](https://www.npmjs.com/package/n8n-nodes-icd11). Every release is published from GitHub Actions through npm **trusted publishing (OIDC)**, with no long-lived publish token in this repository or on the maintainer account; npm issues an ephemeral credential per run and generates the provenance attestation itself. This is what n8n requires for verified nodes.
+
+You can check the published package yourself:
+
+```bash
+npm audit signatures                       # verifies the provenance attestation
+npx @n8n/scan-community-package n8n-nodes-icd11
+```
+
+Release history is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Installation
 
@@ -87,6 +103,21 @@ The API can also be deployed locally with Docker, which is useful for testing wi
 ## Required headers
 
 The API requires `API-Version: v2` and accepts `Accept-Language` to negotiate the language of the returned content.
+
+## Development
+
+```bash
+npm ci
+npm run build
+npm test      # validates the demo workflow against the compiled node
+npm run lint
+```
+
+`npm test` needs no credentials and no network: it loads the compiled node
+description and checks that every operation, parameter and connection in
+`test/workflow-demo.json` actually exists and is visible for its operation.
+See [test/README.md](test/README.md) for the Docker-based checks against a real
+n8n instance.
 
 ## License
 
